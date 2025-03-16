@@ -1,15 +1,17 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Загрузка переменных окружения
+load_dotenv()
+
 # Использование переменных окружения для секретных данных
 SECRET_KEY = os.environ.get('SECRET_KEY', '8434bf93c19ebad8a329a43d760cc17e')
-
-DEBUG = False
-
-ALLOWED_HOSTS = ['rentalbackend-x86y.onrender.com', 'www.rentalbackend-x86y.onrender.com']
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -29,6 +31,7 @@ AUTH_USER_MODEL = 'rentApp.User'
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -100,13 +103,12 @@ USE_TZ = True
 # Настройка статических файлов
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Настройка CORS
-CORS_ALLOWED_ORIGINS = [
-    "https://rentsewxrr.netlify.app",
-]
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
 
 CORS_ALLOW_CREDENTIALS = True
 
