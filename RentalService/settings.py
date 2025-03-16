@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -61,16 +62,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'RentalService.wsgi.application'
 
 # Настройка базы данных
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'rentdb_4v87'),
-        'USER': os.environ.get('DB_USER', 'rentdb_4v87_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'r6aqq5Thow7CDPDvxEpI3QgbTpZNedjV'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+     DATABASES = {
+         'default': dj_database_url.config(default=DATABASE_URL)
     }
-}
+ 
+else:
+     DATABASES = {
+         'default': {
+             'ENGINE': 'django.db.backends.postgresql',
+             'NAME': os.environ.get('DB_NAME', 'rentdb_4v87'),
+             'USER': os.environ.get('DB_USER', 'rentdb_4v87_user'),
+             'PASSWORD': os.environ.get('DB_PASSWORD', 'r6aqq5Thow7CDPDvxEpI3QgbTpZNedjV'),
+             'HOST': os.environ.get('DB_HOST', 'localhost'),
+             'PORT': os.environ.get('DB_PORT', '5432'),
+         }
+     }
 
 #AUTH_PASSWORD_VALIDATORS = [
 #    {

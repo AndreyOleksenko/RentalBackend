@@ -1,1 +1,1 @@
-web: gunicorn RentalService.wsgi --log-file -
+web: cd /opt/render/project/src && gunicorn RentalService.wsgi:application
