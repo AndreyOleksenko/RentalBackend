@@ -5,11 +5,11 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Использование переменных окружения для секретных данных
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key')
+SECRET_KEY = os.environ.get('SECRET_KEY', '8434bf93c19ebad8a329a43d760cc17e')
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['your-backend-domain.com', 'www.your-backend-domain.com']
+ALLOWED_HOSTS = ['rentalbackend-x86y.onrender.com', 'www.rentalbackend-x86y.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -105,7 +105,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Настройка CORS
 CORS_ALLOWED_ORIGINS = [
-    "https://your-frontend-domain.com",
+    "https://rentsewxrr.netlify.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
