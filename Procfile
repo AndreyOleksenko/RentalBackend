@@ -1,1 +1,1 @@
-web: cd /opt/render/project/src && gunicorn RentalService.wsgi:application
+web: gunicorn RentalService.wsgi:application

@@ -18,11 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
 from rest_framework.routers import DefaultRouter
 from rentApp.views import (RoleViewSet, UserViewSet, CarViewSet, RentalViewSet,
                          MaintenanceViewSet, PenaltyViewSet, 
                          DiscountViewSet, generate_agreement, OperatorRentalViewSet,
                          AccountingViewSet, car_financial_history)
+
+def health_check(request):
+    return HttpResponse("API is running", content_type="text/plain")
 
 # Создаем роутер и регистрируем наши ViewSet'ы
 router = DefaultRouter()
@@ -37,6 +41,7 @@ router.register(r'operator/rentals', OperatorRentalViewSet, basename='operator-r
 router.register(r'accounting', AccountingViewSet, basename='accounting')
 
 urlpatterns = [
+    path('', health_check, name='health_check'),
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/auth/', include('rentApp.urls')),
