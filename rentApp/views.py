@@ -670,34 +670,56 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(username=username, password=password)
-        
-        if user:
-            token, _ = Token.objects.get_or_create(user=user)
-            role = user.role.name if hasattr(user, 'role') else None
+        try:
+            username = request.data.get('username')
+            password = request.data.get('password')
             
-            return Response({
-                'token': str(token.key),
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'role': role,
-                    'profile': {
-                        'full_name': user.get_full_name(),
-                        'email': user.email,
-                        'phone': user.phone,
-                        'address': user.address,
-                        'passport_number': user.passport_number,
-                        'driver_license': user.driver_license
-                    }
+            if not username or not password:
+                return Response(
+                    {'error': 'Необходимо указать имя пользователя и пароль'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            user = authenticate(username=username, password=password)
+            
+            if user:
+                token, _ = Token.objects.get_or_create(user=user)
+                
+                # Безопасное получение роли
+                role = None
+                if hasattr(user, 'role') and user.role:
+                    role = user.role.name
+                
+                # Безопасное получение данных профиля
+                profile_data = {
+                    'full_name': user.get_full_name(),
+                    'email': user.email or '',
+                    'phone': getattr(user, 'phone', '') or '',
+                    'address': getattr(user, 'address', '') or '',
+                    'passport_number': getattr(user, 'passport_number', '') or '',
+                    'driver_license': getattr(user, 'driver_license', '') or ''
                 }
-            })
-        return Response(
-            {'error': 'Неверные учетные данные'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+                
+                return Response({
+                    'token': str(token.key),
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'role': role,
+                        'profile': profile_data
+                    }
+                })
+            return Response(
+                {'error': 'Неверные учетные данные'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            # Логирование ошибки
+            print(f"Login error: {str(e)}")
+            return Response(
+                {'error': 'Произошла ошибка при входе в систему'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
