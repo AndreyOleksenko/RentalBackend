@@ -671,51 +671,81 @@ class LoginView(APIView):
 
     def post(self, request):
         try:
+            print("Получен запрос на вход в систему")
             username = request.data.get('username')
             password = request.data.get('password')
             
+            print(f"Данные для входа: username={username}, password={'*' * len(password) if password else None}")
+            
             if not username or not password:
+                print("Ошибка: Отсутствует имя пользователя или пароль")
                 return Response(
                     {'error': 'Необходимо указать имя пользователя и пароль'}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
                 
             user = authenticate(username=username, password=password)
+            print(f"Результат аутентификации: user={user}")
             
             if user:
                 token, _ = Token.objects.get_or_create(user=user)
+                print(f"Токен: {token.key}")
                 
                 # Безопасное получение роли
                 role = None
-                if hasattr(user, 'role') and user.role:
-                    role = user.role.name
+                try:
+                    if hasattr(user, 'role') and user.role is not None:
+                        role = user.role.name
+                        print(f"Роль пользователя: {role}")
+                    else:
+                        print("У пользователя нет роли или роль равна None")
+                except Exception as role_error:
+                    print(f"Ошибка при получении роли: {str(role_error)}")
                 
                 # Безопасное получение данных профиля
-                profile_data = {
-                    'full_name': user.get_full_name(),
-                    'email': user.email or '',
-                    'phone': getattr(user, 'phone', '') or '',
-                    'address': getattr(user, 'address', '') or '',
-                    'passport_number': getattr(user, 'passport_number', '') or '',
-                    'driver_license': getattr(user, 'driver_license', '') or ''
-                }
+                try:
+                    profile_data = {
+                        'full_name': user.get_full_name() if hasattr(user, 'get_full_name') else '',
+                        'email': user.email if hasattr(user, 'email') and user.email else '',
+                        'phone': getattr(user, 'phone', '') or '',
+                        'address': getattr(user, 'address', '') or '',
+                        'passport_number': getattr(user, 'passport_number', '') or '',
+                        'driver_license': getattr(user, 'driver_license', '') or ''
+                    }
+                    print(f"Данные профиля: {profile_data}")
+                except Exception as profile_error:
+                    print(f"Ошибка при получении данных профиля: {str(profile_error)}")
+                    profile_data = {
+                        'full_name': '',
+                        'email': '',
+                        'phone': '',
+                        'address': '',
+                        'passport_number': '',
+                        'driver_license': ''
+                    }
                 
-                return Response({
+                response_data = {
                     'token': str(token.key),
                     'user': {
                         'id': user.id,
                         'username': user.username,
-                        'role': role,
+                        'role': role or 'client',  # Если роль не определена, используем 'client'
                         'profile': profile_data
                     }
-                })
+                }
+                print(f"Отправляем ответ: {response_data}")
+                return Response(response_data)
+                
+            print("Ошибка: Неверные учетные данные")
             return Response(
                 {'error': 'Неверные учетные данные'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
-            # Логирование ошибки
-            print(f"Login error: {str(e)}")
+            # Подробное логирование ошибки
+            import traceback
+            print(f"Критическая ошибка при входе в систему: {str(e)}")
+            print(f"Трассировка: {traceback.format_exc()}")
             return Response(
                 {'error': 'Произошла ошибка при входе в систему'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
