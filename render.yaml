@@ -2,8 +2,8 @@ services:
   - type: web
     name: rentalbackend
     env: python
-    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
-    startCommand: gunicorn RentalService.wsgi:application
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: python -c "import os; import django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'RentalService.settings'); django.setup(); from django.core.management import call_command; call_command('migrate')" && gunicorn RentalService.wsgi:application
     envVars:
       - key: SECRET_KEY
         generateValue: true
