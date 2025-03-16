@@ -3,7 +3,13 @@ services:
     name: rentalbackend
     env: python
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: python -c "import os; import django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'RentalService.settings'); django.setup(); from django.core.management import call_command; call_command('migrate')" && gunicorn RentalService.wsgi:application
+    startCommand: >
+      python -c "import os; import django; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'RentalService.settings'); 
+      django.setup(); from django.core.management import call_command; 
+      call_command('migrate'); 
+      try: call_command('loaddata', 'data.json'); print('Данные успешно загружены!'); 
+      except Exception as e: print(f'Ошибка при загрузке данных: {e}');" && 
+      gunicorn RentalService.wsgi:application
     envVars:
       - key: SECRET_KEY
         generateValue: true
