@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
-import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -12,7 +11,7 @@ load_dotenv()
 # Использование переменных окружения для секретных данных
 SECRET_KEY = os.environ.get('SECRET_KEY', '8434bf93c19ebad8a329a43d760cc17e')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.railway.com').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -62,23 +61,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'RentalService.wsgi.application'
 
 # Настройка базы данных
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-     DATABASES = {
-         'default': dj_database_url.config(default=DATABASE_URL)
+# Используем SQLite для всех окружений
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
- 
-else:
-     DATABASES = {
-         'default': {
-             'ENGINE': 'django.db.backends.postgresql',
-             'NAME': os.environ.get('DB_NAME', 'rentdb_4v87'),
-             'USER': os.environ.get('DB_USER', 'rentdb_4v87_user'),
-             'PASSWORD': os.environ.get('DB_PASSWORD', 'r6aqq5Thow7CDPDvxEpI3QgbTpZNedjV'),
-             'HOST': os.environ.get('DB_HOST', 'localhost'),
-             'PORT': os.environ.get('DB_PORT', '5432'),
-         }
-     }
+}
 
 #AUTH_PASSWORD_VALIDATORS = [
 #    {
@@ -116,7 +105,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Настройка CORS
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'https://rentsewxrr.netlify.app,http://localhost:3000').split(',')
+CORS_ALLOWED_ORIGINS = ['https://rentsewxrr.netlify.app', 'http://localhost:3000']
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # В режиме отладки разрешаем все источники
 
 CORS_ALLOW_CREDENTIALS = True
