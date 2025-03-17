@@ -11,7 +11,7 @@ load_dotenv()
 # Использование переменных окружения для секретных данных
 SECRET_KEY = os.environ.get('SECRET_KEY', '8434bf93c19ebad8a329a43d760cc17e')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.railway.com').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.railway.app,.up.railway.app,web-production-da0b.up.railway.app').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
