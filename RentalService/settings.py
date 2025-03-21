@@ -105,7 +105,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Настройка CORS
-CORS_ALLOWED_ORIGINS = ['https://rentsewxrr.netlify.app', 'http://localhost:3000']
+CORS_ALLOWED_ORIGINS = [
+       'https://rentsewxrr.netlify.app', 
+       'http://localhost:3000',
+       'https://web-production-da0b.up.railway.app'
+   ]
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # В режиме отладки разрешаем все источники
 
 CORS_ALLOW_CREDENTIALS = True
